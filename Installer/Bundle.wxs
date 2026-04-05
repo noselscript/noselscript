@@ -1,0 +1,11 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <Bundle UpgradeCode="A75CEC4C-43CE-4B67-AF91-B74DA7D9CA51" Compressed="yes" Manufacturer="NoselScript" Name="NoselScript with NodeJS" Version="1.0.0.0">
+    <Chain>
+      <MsiPackage SourceFile="WixPieOutput\Installer.msi" />
+      <MsiPackage SourceFile="..\..\..\..\..\Downloads\node-v24.14.1-x64.msi" />
+    </Chain>
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication LicenseFile="License.rtf" LogoFile="iconbundle.png" />
+    </BootstrapperApplicationRef>
+  </Bundle>
+</Wix>

@@ -1,0 +1,57 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="329B5623-8884-4515-A85F-4C0C95F6F7A9" UpgradeCode="05E252B9-1B9D-42C7-94E3-BE70EE662C22" Version="1.0.0.0" Name="NoselScript" Manufacturer="NoselScript devs" Language="1033">
+    <Package InstallerVersion="200" InstallScope="perMachine" InstallPrivileges="elevated" Compressed="yes" Manufacturer="NoselScript Devs" />
+    
+    <Media EmbedCab="yes" Cabinet="media1.cab" Id="1" />
+    
+    <WixVariable Id="WixUIDialogBmp" Value="Back.png" />
+    <WixVariable Id="WixUIBannerBmp" Value="Head.png" />
+    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+    
+    <WixVariable Id="WixUIAdvancedWelcomeEulaDlgTitle" Value="{\WixUI_Font_Title}NoselScript Compiler Setup Wizard" />
+    
+    <Property Id="ApplicationFolderName" Value="NoselScript" />
+    <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="MyAppFolder" Name="NoselScript" />
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="RemoveFolders">
+      <ComponentRef Id="Remove.ProgramFiles64Folder" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="Nosel">
+      <ComponentRef Id="CId26E2C494" />
+      <ComponentRef Id="PathEnvironmentVar" />
+    </ComponentGroup>
+
+    <Feature Id="ProductFeature" Title="MainFeature" Description="FeatureMain">
+      <ComponentGroupRef Id="RemoveFolders" />
+      <ComponentGroupRef Id="Nosel" />
+    </Feature>
+
+    <UIRef Id="WixUI_Advanced" />
+
+    <DirectoryRef Id="ProgramFiles64Folder">
+      <Component Id="Remove.ProgramFiles64Folder" Guid="32D76267-A050-4880-A727-46C2A4A9EC56">
+        <RemoveFolder Id="ProgramFiles64Folder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MyAppFolder">
+      <Component Id="CId26E2C494" Guid="A9EE58D8-E4B2-438D-B48C-2446432D6DAC" Win64="yes">
+        <File Id="FId01D68D52" Name="noselc.exe" Source="C:\Users\zohan\OneDrive\Desktop\g4br\NoselScript_Project\bin\windows\noselc.exe" KeyPath="yes" />
+      </Component>
+
+      <Component Id="PathEnvironmentVar" Guid="E8421061-1234-4567-89AB-C2446432D6DA">
+        <RegistryValue Root="HKMU" Key="Software\[Manufacturer]\[ProductName]" Name="PathUpdated" Type="integer" Value="1" KeyPath="yes" />
+        <Environment Id="PATH" Name="PATH" Value="[MyAppFolder]" Permanent="no" Part="last" Action="set" System="yes" />
+      </Component>
+    </DirectoryRef>
+
+  </Product>
+</Wix>

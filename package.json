@@ -1,0 +1,20 @@
+{
+  "name": "noselscript",
+  "version": "1.0.0",
+  "main": "CompilerRepl/repl.js",
+  "bin": "CompilerRepl/repl.js",
+  "scripts": {
+    "start": "node CompilerRepl/repl.js",
+    "test": "node CompilerRepl/repl.js tests/test.ns",
+    "build:win": "pkg . --target node18-win-x64 --output bin/windows/noselc.exe --public",
+    "build:linux": "pkg . --target node18-linux-x64 --output bin/linux/noselc --public",
+    "build:mac": "pkg . --target node18-macos-x64 --output bin/macos/noselc --public",
+    "build": "npm run build:win && npm run build:linux && npm run build:mac"
+  },
+  "pkg": {
+    "assets": [
+      "API/api.js",
+      "tests/**/*.ns"
+    ]
+  }
+}
