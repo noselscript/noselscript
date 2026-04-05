@@ -62,8 +62,11 @@ im lazy to make this md
 NoselScript has mutliple editons
 
 NodeJS Editon:(this is default and what NoselScript is mainly written in)
+
 Haxe Editon: (this is haxe which is for people who doesnt want JS and a ActionScript Like)
+
 ActionScript Editon: (this for flash or stuff idk why i made it)
+
 TypeScript Editon:Yeah just typescript editon
 
 idk why i made those
