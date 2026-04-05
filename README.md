@@ -71,6 +71,9 @@ TypeScript Editon:Yeah just typescript editon
 
 idk why i made those
 
+# Builds
+
+Builds support need NuShell or Python:) run them idgaf
 
 
 
