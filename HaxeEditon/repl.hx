@@ -1,8 +1,9 @@
+import api.NoselApi; // Importing your API module
 import sys.io.File;
 import sys.FileSystem;
 import haxe.io.Path;
 
-class Main {
+class Repl {
     static var colors = {
         reset: "\x1b[0m",
         keyword: "\x1b[33;1m",
@@ -18,26 +19,27 @@ class Main {
 
         code = rKeywords.replace(code, colors.keyword + "$1" + colors.reset);
         code = rStrings.replace(code, colors.string + "$1" + colors.reset);
-        code = rNumbers.replace(code, colors.number + "$1" + colors.reset);
-        return code;
+        return rNumbers.replace(code, colors.number + "$1" + colors.reset);
     }
 
     static function transpile(code:String):String {
-        // Import handling
+        // Handle imports
         var rImport = ~/import\s+([\w.]+);/g;
         code = rImport.map(code, function(re) {
             var dotPath = re.matched(1);
-            if (dotPath == "io") return "var io = IO;";
-            
             var parts = dotPath.split(".");
             var name = parts[parts.length - 1];
-            var targetPath = Path.join([NoselAPI.currentDir, parts.join("/")]) + ".ns";
-            return 'var $name = NoselRuntime.require("${targetPath}");';
+            
+            if (name == "io") return "var io = NoselApi.io;";
+
+            var targetPath = Path.join([NoselApi.currentDir, parts.join("/")]) + ".ns";
+            // Escaping path for the generated code
+            return 'var $name = loadNoselModule("${StringTools.replace(targetPath, "\\", "\\\\")}");';
         });
 
-        // Syntax Sugar
         code = StringTools.replace(code, "extend class", "class");
         code = StringTools.replace(code, "exports =", "module.exports =");
+        code = StringTools.replace(code, "logln", "NoselApi.logln");
         
         return code;
     }
@@ -46,47 +48,47 @@ class Main {
         var args = Sys.args();
 
         if (args.length > 0) {
-            // File Mode
             var filePath = Path.normalize(args[0]);
             if (!FileSystem.exists(filePath)) {
-                Sys.println("\x1b[31mError: Script not found\x1b[0m");
-                return;
+                Sys.println('\x1b[31mError: Script not found at $filePath\x1b[0m');
+                Sys.exit(1);
             }
 
-            NoselAPI.currentDir = Path.directory(filePath);
+            NoselApi.currentDir = Path.directory(filePath);
             try {
                 var content = File.getContent(filePath);
-                var jsCode = transpile(content);
-                // In a real Haxe tool, you'd output this to a file or use an interpreter
-                Sys.println("--- Transpiled Output ---");
-                Sys.println(jsCode);
+                Sys.println(transpile(content)); 
             } catch (e:haxe.Exception) {
-                NoselAPI.raiseNoselError(e);
+                NoselApi.raiseNoselError(e, false);
             }
         } else {
-            // REPL Mode
             Sys.println("NoselScript Haxe-Edition v.1.0.0");
-            var buffer = "";
+            Sys.println("A programming language with an ide, conversion to python, etc.");
             
+            var buffer = "";
             while (true) {
-                Sys.print(colors.prompt + (buffer == "" ? "> " : ">>> ") + colors.reset);
-                var line = Sys.stdin().readLine();
-                buffer += line + "\n";
+                var isMulti = buffer != "";
+                Sys.print('${colors.prompt}${isMulti ? ">>>" : ">"}${colors.reset} ');
+                
+                try {
+                    var line = Sys.stdin().readLine();
+                    buffer += line + "\n";
 
-                // Basic brace counting
-                var open = buffer.split("{").length - 1;
-                var close = buffer.split("}").length - 1;
+                    var open = buffer.split("{").length - 1;
+                    var close = buffer.split("}").length - 1;
 
-                if (open <= close) {
-                    try {
-                        var out = transpile(buffer);
-                        Sys.println(highlight("// Executing logic..."));
-                        Sys.println(out);
-                        buffer = "";
-                    } catch (e:haxe.Exception) {
-                        NoselAPI.raiseNoselError(e, true);
+                    if (open <= close) {
+                        if (StringTools.trim(buffer) != "") {
+                            var result = transpile(buffer);
+                            Sys.println(highlight(result));
+                        }
                         buffer = "";
                     }
+                } catch (e:haxe.io.Eof) {
+                    break; // Exit on Ctrl+C/D
+                } catch (e:haxe.Exception) {
+                    NoselApi.raiseNoselError(e, true);
+                    buffer = "";
                 }
             }
         }
