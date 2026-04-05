@@ -2,11 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
-/**
- * PKG FIX: 
- * We use a literal string here so the 'pkg' compiler can statically 
- * analyze and bundle the API into the binary snapshot.
- */
 require('../API/api.js');
 
 const colors = {
@@ -17,7 +12,6 @@ const colors = {
     prompt: "\x1b[35;1m",
 };
 
-// --- Module Support ---
 require.extensions['.ns'] = function (module, filename) {
     const content = fs.readFileSync(filename, 'utf8');
     const oldDir = global.NoselConfig.currentDir;
